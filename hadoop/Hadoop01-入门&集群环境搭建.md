@@ -386,6 +386,7 @@ Shell 编程一般指 shell 脚本编程。
 > disable 关闭
 
 **修改selinux的配置文件**
+
 > vi /etc/selinux/config
 
 ### 5.3 三台机器机器免密码登录
@@ -394,6 +395,7 @@ Shell 编程一般指 shell 脚本编程。
 > Hadoop 节点众多, 所以一般在主节点启动从节点, 这个时候就需要程序自动在主节点登录到从节点中, 如果不能免密就每次都要输入密码, 非常麻烦
 
 **免密 SSH 登录的原理**
+
 > 需要先在 B节点 配置 A节点 的公钥
 > A节点 请求 B节点 要求登录
 > B节点 使用 A节点 的公钥, 加密一段随机文本
@@ -1128,8 +1130,8 @@ HDFS: http://192.168.204.101:50070/dfshealth.html#tab-overview
 Yarn: http://192.168.204.101:8088/cluster
 报错：设置hadoop-env.sh
 
-export HDFS_NAMENODE_USER="root"
-export HDFS_DATANODE_USER="root"
-export HDFS_SECONDARYNAMENODE_USER="root"
-export YARN_RESOURCEMANAGER_USER="root"
-export YARN_NODEMANAGER_USER="root"
+> export HDFS_NAMENODE_USER="root"
+> export HDFS_DATANODE_USER="root"
+> export HDFS_SECONDARYNAMENODE_USER="root"
+> export YARN_RESOURCEMANAGER_USER="root"
+> export YARN_NODEMANAGER_USER="root"
