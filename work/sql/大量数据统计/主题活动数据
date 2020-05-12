@@ -1,0 +1,88 @@
+1. 主题访问次数+主题访问次数
+
+```sql
+SELECT SUM(visitCnt),SUM(visitPeopleCnt) from jkb_vip_core.data_theme_activity_date where themeId=9
+```
+
+2. 霸王餐活动数据
+
+```sql
+select
+d.actName 活动名称,
+b.visitCnt 访问次数,
+b.visitPeopleCnt 访问人数,
+COUNT(DISTINCT c.wuId) 参与抽奖人数,
+b.shareCnt 分享次数,
+b.sharePeopleCnt 分享人数,
+b.shareJoinCnt 通过分享参与活动次数,
+b.shareJoinPeopleCnt 通过分享参与活动人数,
+b.addVip 新增会员
+from jkb_vip.theme_column_activity a
+INNER JOIN jkb_vip.activity d on a.actId=d.actId
+LEFT JOIN 
+(
+	SELECT actId,SUM(visitCnt) visitCnt,SUM(visitPeopleCnt) visitPeopleCnt,
+	SUM(shareCnt) shareCnt,SUM(sharePeopleCnt) sharePeopleCnt,SUM(shareJoinCnt) shareJoinCnt,
+	SUM(shareJoinPeopleCnt) shareJoinPeopleCnt,sum(receiveVipCardCnt-vipReceiveVipCardCnt) addVip
+	from  jkb_vip_core.data_activity_date GROUP BY actId
+)b  on a.actId=b.actId
+LEFT JOIN jkb_vip.user_draw_code_record c on a.actId=c.actId 
+where a.columnId=15 and a.state=1
+GROUP BY a.actId
+```
+
+3. 霸王餐活动渠道数据
+
+```sql
+select
+d.actName 活动名称,
+e.channelName 渠道名称,
+b.visitCnt 访问次数,
+b.visitPeopleCnt 访问人数,
+b.joinPeopleCnt 参与抽奖人数,
+b.addVip 新增会员
+from jkb_vip.theme_column_activity a
+INNER JOIN jkb_vip.activity d on a.actId=d.actId
+LEFT JOIN 
+(
+	SELECT a.actId,a.channelCode,SUM(visitCnt) visitCnt,SUM(visitPeopleCnt) visitPeopleCnt,
+	sum(receiveVipCardCnt-vipReceiveVipCardCnt) addVip,SUM(joinPeopleCnt) joinPeopleCnt
+	from  jkb_vip_core.data_activity_channel_date  a
+	INNER JOIN jkb_vip.theme_column_activity b on a.actId=b.actId and  b.columnId=15 and b.state=1
+	GROUP BY a.actId,a.channelCode
+)b  on a.actId=b.actId
+LEFT JOIN jkb_vip.channel_track_label e on b.channelCode=e.channelCode
+where a.columnId=15 and a.state=1
+GROUP BY a.actId,b.channelCode
+```
+
+4. 开奖时间
+
+```sql
+select
+FROM_UNIXTIME(m.endTime/1000,'%Y-%m-%d %H:%i:%S') 开奖时间,
+d.actName 活动名称,
+e.channelName 渠道名称,
+b.visitCnt 访问次数,
+b.visitPeopleCnt 访问人数,
+b.joinPeopleCnt 参与抽奖人数,
+b.addVip 新增会员,
+b.receiveVipCardCnt 获取会员卡总数,
+b.vipReceiveVipCardCnt 会员获取会员卡数
+from jkb_vip.theme_column_activity a
+INNER JOIN jkb_vip.activity d on a.actId=d.actId
+INNER JOIN jkb_vip.activity_dine_and_dash m on a.actId=m.actId
+LEFT JOIN 
+(
+	SELECT a.actId,a.channelCode,SUM(visitCnt) visitCnt,SUM(visitPeopleCnt) visitPeopleCnt,
+	sum(receiveVipCardCnt-vipReceiveVipCardCnt) addVip,SUM(joinPeopleCnt) joinPeopleCnt,
+	SUM(receiveVipCardCnt) receiveVipCardCnt,SUM(vipReceiveVipCardCnt) vipReceiveVipCardCnt
+	from  jkb_vip_core.data_activity_channel_date  a
+	INNER JOIN jkb_vip.theme_column_activity b on a.actId=b.actId and  b.columnId=15 and b.state=1
+	GROUP BY a.actId,a.channelCode,a.cdate
+)b  on a.actId=b.actId
+LEFT JOIN jkb_vip.channel_track_label e on b.channelCode=e.channelCode
+where a.columnId=15 and a.state=1
+GROUP BY a.actId,b.channelCode
+```
+
